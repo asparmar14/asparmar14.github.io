@@ -32,6 +32,31 @@
   --serif:     'Instrument Serif', serif;
 }
 
+/* ---- LIGHT THEME ---- */
+body.light-theme {
+  --bg:        #f8fafc;
+  --bg-2:      #eef2f7;
+  --bg-3:      #e2e8f0;
+  --bg-card:   #ffffff;
+
+  --border:    rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.12);
+
+  --text:      #0f172a;
+  --text-2:    #475569;
+  --text-3:    #94a3b8;
+
+  --green:     #16a34a;
+  --green-dim: rgba(22,163,74,0.12);
+  --green-glow:rgba(22,163,74,0.25);
+
+  --amber:     #d97706;
+  --amber-dim: rgba(217,119,6,0.12);
+
+  --blue:      #2563eb;
+  --blue-dim:  rgba(37,99,235,0.12);
+}
+
 html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
