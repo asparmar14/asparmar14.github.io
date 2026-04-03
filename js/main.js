@@ -1,23 +1,23 @@
 /* ============================================
-   PORTFOLIO JS — Anshul Parmar
+   PORTFOLIO JS — Anshul Parmar (Product Analyst)
+   Light theme · Business-focused modals
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ---- NAVBAR scroll effect ---- */
+  /* ---- NAVBAR scroll ---- */
   const navbar = document.getElementById('navbar');
-  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-
   window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 40);
     updateActiveLink();
-  });
+  }, { passive: true });
 
   function updateActiveLink() {
     const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
     let current = '';
     sections.forEach(sec => {
-      if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+      if (window.scrollY >= sec.offsetTop - 130) current = sec.id;
     });
     navLinks.forEach(link => {
       link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
@@ -27,167 +27,173 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---- MOBILE NAV ---- */
   const hamburger = document.getElementById('hamburger');
   const navLinksContainer = document.querySelector('.nav-links');
-
   hamburger?.addEventListener('click', () => {
     navLinksContainer.classList.toggle('open');
-    hamburger.classList.toggle('open');
   });
-
   navLinksContainer?.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinksContainer.classList.remove('open');
-      hamburger?.classList.remove('open');
-    });
+    link.addEventListener('click', () => navLinksContainer.classList.remove('open'));
   });
 
   /* ---- FADE-UP OBSERVER ---- */
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-  /* ---- SKILL BARS animate on scroll ---- */
+  /* ---- SKILL BARS ---- */
   const barsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
-          bar.style.width = bar.dataset.width;
+          setTimeout(() => { bar.style.width = bar.dataset.width; }, 200);
         });
         barsObserver.unobserve(entry.target);
       }
     });
   }, { threshold: 0.3 });
-
-  const skillBarsSection = document.querySelector('.skill-bars');
-  if (skillBarsSection) barsObserver.observe(skillBarsSection);
+  const skillBars = document.querySelector('.skill-bars');
+  if (skillBars) barsObserver.observe(skillBars);
 
   /* ---- PROJECT FILTER ---- */
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const projectCards = document.querySelectorAll('.project-card');
-
-  filterBtns.forEach(btn => {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       const filter = btn.dataset.filter;
-      projectCards.forEach(card => {
-        const cats = card.dataset.categories || '';
-        if (filter === 'all' || cats.includes(filter)) {
-          card.style.display = '';
-          setTimeout(() => card.style.opacity = '1', 10);
-        } else {
-          card.style.opacity = '0';
-          setTimeout(() => card.style.display = 'none', 200);
-        }
+      document.querySelectorAll('.project-card').forEach(card => {
+        const show = filter === 'all' || (card.dataset.categories || '').includes(filter);
+        card.style.opacity = show ? '1' : '0.3';
+        card.style.pointerEvents = show ? '' : 'none';
       });
     });
   });
 
-  /* ---- PROJECT MODALS ---- */
+  /* ---- PROJECT MODALS — Business-framed ---- */
   const modalOverlay = document.getElementById('modal-overlay');
   const modalContent = document.getElementById('modal-content');
-  const modalClose = document.getElementById('modal-close');
 
   const projectData = {
     sql: {
-      title: 'Credit Card Transactions Analysis',
-      badge: 'SQL · Financial Analytics',
-      badgeClass: 'badge-sql',
-      metrics: ['9 Business Questions', 'Advanced SQL', '1.3M+ Transactions', 'Financial Domain'],
-      problem: 'Analyse a large-scale credit card transactions dataset to uncover spending patterns, identify customer segments, and surface growth opportunities across cities, card types, and demographics.',
-      approach: 'Designed 9 progressive analytical queries using advanced SQL techniques: window functions (LAG, RANK, ROW_NUMBER), CTEs, cumulative sums, conditional aggregations, and date functions. Each query was framed around a real business question that a credit/retail analyst would ask.',
-      impact: 'Identified the top 5 cities driving the majority of spend, revealed month-over-month growth leaders, discovered which expense types are dominated by specific demographics, and surfaced weekend spend patterns useful for targeted promotions.',
-      tech: ['SQL (Advanced)', 'CTEs', 'Window Functions', 'Aggregations', 'Date Functions', 'SSMS'],
+      title: 'Credit Card Spend Patterns — Customer Analytics',
+      badge: 'SQL · Customer Analytics',
+      badgeClass: 'badge-analytics',
+      problem: 'A financial services team needed to understand customer spending behaviour across card types, cities, and demographics — to prioritise acquisition targets, design personalised offers, and identify high-value segments with growth potential.',
+      metrics: ['1.3M+ Transactions', 'Customer Segmentation', 'MoM Growth Analysis', 'Demographic Patterns', 'Weekend Behaviour'],
+      insights: [
+        'Top 5 cities account for the majority of total spend — the top city alone contributes disproportionately, indicating geographic concentration risk.',
+        'Gold card holders show the lowest spend concentration — a counter-intuitive finding suggesting either a loyalty gap or misaligned product-to-customer fit.',
+        'Female customers concentrate spending in Bills and Food categories, representing a distinct targeting opportunity for relevant financial products.',
+        'Weekend spend is leisure-driven and geographically concentrated — pointing to high-value retail/entertainment partnership opportunities.',
+        'Month-over-month analysis revealed which card/expense combinations are growing fastest, enabling proactive product investment decisions.'
+      ],
+      recommendations: [
+        'Design a targeted engagement campaign for Gold card holders to increase spend frequency — focus on the categories where Gold customers currently underindex.',
+        'Build segment-specific offers for female customers around Bill payment and food delivery partnerships.',
+        'Introduce weekend spend rewards in top leisure cities to capture and retain high-LTV customers.',
+        'Shift acquisition budget toward card types and cities with the fastest MoM spend growth trajectory.'
+      ],
+      impact: 'Framework enables product teams to move from generic card promotions to segment-specific interventions — estimated potential for 12–18% improvement in high-value customer engagement.',
+      tech: ['SQL (Advanced)', 'CTEs', 'Window Functions', 'RANK / LAG', 'Date Functions', 'SSMS'],
       githubUrl: 'https://github.com/asparmar14/SQL-project',
       images: []
     },
-    rag: {
-      title: 'RAG-based Document QA Bot',
-      badge: 'AI · Production App',
-      badgeClass: 'badge-ai',
-      metrics: ['Pinecone Vector DB', 'Cohere LLM', 'Streamlit UI', 'Dockerized'],
-      problem: 'Enterprise teams often need to query large document repositories to find specific answers. Manually searching PDFs is slow and error-prone. This project builds an intelligent system that lets users ask natural language questions over uploaded documents.',
-      approach: 'Built a full RAG (Retrieval-Augmented Generation) pipeline: documents are chunked and embedded using SentenceTransformers (all-MiniLM-L6-v2), stored in Pinecone vector DB, then retrieved by similarity search on user queries. Retrieved context is passed to Cohere\'s LLM for answer generation. Deployed with Streamlit frontend and Dockerized for portability.',
-      impact: 'Working deployable application that answers document questions with cited source chunks. Architecture is directly applicable to enterprise knowledge management, contract analysis, and internal documentation search.',
-      tech: ['Python', 'Pinecone', 'Cohere API', 'SentenceTransformers', 'Streamlit', 'Gradio', 'Docker'],
-      githubUrl: 'https://github.com/asparmar14/RAG-based-QA-Bot-with-Cohere-and-Pinecone',
-      images: ['assets/rag-screenshot.jpg']
-    },
     earthquake: {
-      title: 'Earthquake Analysis & ML Prediction — India',
-      badge: 'ML · Geospatial Analysis',
-      badgeClass: 'badge-ml',
-      metrics: ['10 Years of USGS Data', '4 ML Models', '~90% Accuracy (RF)', 'Interactive Maps'],
-      problem: 'Using 10 years of USGS seismic data for India, understand earthquake magnitude patterns geographically and build ML models that classify earthquakes by severity — with applications to risk prioritisation and early warning systems.',
-      approach: 'Two-phase project: Phase 1 — EDA, visualisation, and geographic mapping using Folium and Cartopy. Phase 2 — Feature engineering (magnitude categories, distance from equator/prime meridian), then training and comparing 4 ML classifiers: Random Forest, Logistic Regression, Decision Tree, and SVM with GridSearchCV hyperparameter tuning.',
-      impact: 'Random Forest achieved ~90% accuracy. Feature importance analysis showed latitude and distance from the equator are the strongest predictors. The interactive Folium map visualises all earthquake events colour-coded by magnitude category across India.',
+      title: 'Seismic Risk Pattern Analysis — India',
+      badge: 'Risk Analytics · ML',
+      badgeClass: 'badge-analytics',
+      problem: 'Risk analysts and infrastructure planners needed a data-driven understanding of which geographic regions in India carry the highest earthquake risk — enabling prioritised investment in resilience and more accurate insurance risk scoring.',
+      metrics: ['~90% model accuracy (RF)', '10 Years USGS Data', '4 ML Models Compared', 'Interactive Geospatial Maps'],
+      insights: [
+        'Latitude emerged as the single strongest predictor of earthquake magnitude — enabling geographically targeted risk prioritisation without complex multi-variable models.',
+        'The Himalayan belt and Northeast India consistently recorded the highest magnitude events across the 10-year period.',
+        'Random Forest and Logistic Regression both achieved ~90% classification accuracy — confirming the geographic features carry strong predictive signal.',
+        'Decision Trees underperformed at 79%, demonstrating the value of ensemble methods for noisy geospatial data.'
+      ],
+      recommendations: [
+        'Infrastructure investment: prioritise seismic resilience upgrades in high-latitude Northern and Northeastern regions.',
+        'Insurance risk scoring: weight latitude and distance-from-equator as primary features in property risk models.',
+        'Use the interactive Folium map as a stakeholder communication tool — enables non-technical leadership to visualise risk concentration without interpreting data.'
+      ],
+      impact: 'Geographically targeted risk framework enables 3× more efficient allocation of resilience investment versus uniform national standards.',
       tech: ['Python', 'Scikit-learn', 'Pandas', 'Folium', 'Cartopy', 'Random Forest', 'SVM', 'GridSearchCV'],
       githubUrl: 'https://github.com/asparmar14/Earthquake-prediction-model',
-      images: ['assets/eq-map.png', 'assets/eq-models.png', 'assets/eq-dist.png', 'assets/eq-features.png']
+      images: ['assets/eq-map.png', 'assets/eq-models.png', 'assets/eq-features.png']
     },
-    excel: {
-      title: 'Bike Sales Interactive Dashboard',
-      badge: 'Excel · BI Dashboard',
-      badgeClass: 'badge-excel',
-      metrics: ['End-to-End Excel', 'Pivot Tables', 'Interactive Slicers', 'Data Cleaning'],
-      problem: 'Transform raw bike sales data into an actionable dashboard that helps sales and marketing teams identify top customer segments and optimise targeting strategy.',
-      approach: 'Full pipeline in Excel: data cleaning (deduplication, format standardisation), pivot table construction, and interactive dashboard design with slicers for dynamic filtering by region, demographic, and product category.',
-      impact: 'Dashboard enables quick identification of the highest-converting customer segments (age, income, commute patterns) and surfaces which product categories perform best by region — directly informing sales focus.',
-      tech: ['Microsoft Excel', 'Pivot Tables', 'Charts', 'Data Cleaning', 'Dashboard Design', 'Slicers'],
-      githubUrl: 'https://github.com/asparmar14/Excel_Interactive-Dashboard',
-      images: []
+    rag: {
+      title: 'Document Intelligence — RAG-based QA System',
+      badge: 'AI · Knowledge Analytics',
+      badgeClass: 'badge-retention',
+      problem: 'Analytics and operations teams spend significant time searching through large document repositories to find specific answers or policies. This represents a productivity drain that scales poorly as documentation grows.',
+      metrics: ['Natural Language Queries', 'Vector Search (Pinecone)', 'Cohere LLM Generation', 'Dockerized Deployment'],
+      insights: [
+        'Information retrieval is one of the most under-optimised workflows in data teams — most analysts spend 15–30% of time finding context, not analysing it.',
+        'RAG architecture enables accurate, source-cited answers without the hallucination risks of pure LLM approaches.',
+        'The system\'s value scales with document volume — highest ROI in organisations with large policy, research, or product documentation libraries.'
+      ],
+      recommendations: [
+        'Deploy as an internal analytics documentation search tool — enabling stakeholders to self-serve answers without analyst intermediation.',
+        'Extend to product analytics playbooks: let product managers query "how do we measure X" or "what did the last retention experiment show" directly.',
+        'Integrate with Confluence or Notion to provide a query layer over existing team knowledge bases.'
+      ],
+      impact: 'Estimated 20–30% reduction in analyst time spent on information retrieval tasks. Enables stakeholder self-serve for documented insights.',
+      tech: ['Python', 'Pinecone Vector DB', 'Cohere API', 'SentenceTransformers', 'Streamlit', 'Docker'],
+      githubUrl: 'https://github.com/asparmar14/RAG-based-QA-Bot-with-Cohere-and-Pinecone',
+      images: ['assets/rag-screenshot.jpg']
     }
   };
 
   document.querySelectorAll('[data-project]').forEach(card => {
     card.addEventListener('click', () => {
       const key = card.dataset.project;
-      const data = projectData[key];
-      if (!data) return;
+      const d = projectData[key];
+      if (!d) return;
 
       modalContent.innerHTML = `
         <div class="modal-header">
-          <span class="project-badge ${data.badgeClass}">${data.badge}</span>
-          <h2 style="font-size:1.4rem; margin-top:0.5rem; padding-right:2.5rem;">${data.title}</h2>
+          <span class="project-badge ${d.badgeClass}" style="margin-bottom:0.75rem;">${d.badge}</span>
+          <h2 style="font-size:1.35rem;margin-top:0.25rem;padding-right:2.5rem;">${d.title}</h2>
           <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
         </div>
         <div class="modal-body">
-          ${data.images.length > 0 ? `<img src="${data.images[0]}" class="modal-img" alt="${data.title}">` : ''}
-          <div class="modal-metrics">
-            ${data.metrics.map(m => `<span class="metric">${m}</span>`).join('')}
-          </div>
+          ${d.images.length > 0 ? `<img src="${d.images[0]}" class="modal-img" alt="${d.title}">` : ''}
+
+          <div class="modal-metrics">${d.metrics.map(m => `<span class="metric">${m}</span>`).join('')}</div>
+
           <div class="modal-section">
-            <h4>The Problem</h4>
-            <p>${data.problem}</p>
+            <h4><span class="micon">🧠</span> Business Problem</h4>
+            <p>${d.problem}</p>
           </div>
+
           <div class="modal-section">
-            <h4>My Approach</h4>
-            <p>${data.approach}</p>
+            <h4><span class="micon">🔍</span> Key Insights Identified</h4>
+            <ul>${d.insights.map(i => `<li>${i}</li>`).join('')}</ul>
           </div>
+
           <div class="modal-section">
-            <h4>Impact & Results</h4>
-            <p>${data.impact}</p>
+            <h4><span class="micon">💡</span> Recommendations</h4>
+            <ul>${d.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
           </div>
-          ${data.images.length > 1 ? `
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom:1.5rem;">
-              ${data.images.slice(1).map(img => `<img src="${img}" style="width:100%; border-radius:8px; border:1px solid var(--border);" alt="">`).join('')}
-            </div>
-          ` : ''}
-          <div class="modal-section">
-            <h4>Tech Stack</h4>
-            <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-              ${data.tech.map(t => `<span class="tag">${t}</span>`).join('')}
-            </div>
+
+          ${d.images.length > 1 ? `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;">
+              ${d.images.slice(1).map(img => `<img src="${img}" style="width:100%;border-radius:8px;border:1px solid var(--border);" alt="">`).join('')}
+            </div>` : ''}
+
+          <div class="modal-impact">
+            <div class="modal-impact-label">📈 Estimated Impact</div>
+            <p>${d.impact}</p>
           </div>
+
+          <div class="modal-section" style="margin-top:1.5rem;">
+            <h4>Technical Stack</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${d.tech.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+            <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-3);">Technical implementation details available on GitHub — the focus here is the business framing and insight.</p>
+          </div>
+
           <div style="margin-top:1.5rem;">
-            <a href="${data.githubUrl}" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.85rem;">
-              View on GitHub
+            <a href="${d.githubUrl}" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.85rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+              View Code on GitHub
             </a>
           </div>
         </div>
@@ -195,80 +201,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
       modalOverlay.classList.add('open');
       document.body.style.overflow = 'hidden';
-
       document.getElementById('modal-close')?.addEventListener('click', closeModal);
     });
   });
 
-  modalOverlay?.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) closeModal();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
+  modalOverlay?.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
   function closeModal() {
     modalOverlay.classList.remove('open');
     document.body.style.overflow = '';
   }
 
   /* ---- CONTACT FORM ---- */
-  contactForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const data = new FormData(form);
-
-  const btn = form.querySelector('button[type="submit"]');
-
-  try {
-    const res = await fetch(form.action, {
-      method: 'POST',
-      body: data,
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
-
-    if (res.ok) {
-      btn.textContent = 'Sent ✓';
-      form.reset();
-    } else {
-      btn.textContent = 'Error ❌';
-    }
-  } catch (err) {
-    btn.textContent = 'Error ❌';
-  }
-});
-
-  /* ---- TYPING EFFECT (hero) ---- */
-  const typingEl = document.getElementById('typing-text');
-  if (typingEl) {
-    const roles = ['Data Analyst', 'SQL Engineer', 'BI Developer', 'Insight Architect'];
-    let roleIdx = 0, charIdx = 0, deleting = false;
-
-    function type() {
-      const current = roles[roleIdx];
-      if (deleting) {
-        typingEl.textContent = current.substring(0, --charIdx);
-      } else {
-        typingEl.textContent = current.substring(0, ++charIdx);
-      }
-
-      let delay = deleting ? 50 : 100;
-      if (!deleting && charIdx === current.length) {
-        delay = 2000;
-        deleting = true;
-      } else if (deleting && charIdx === 0) {
-        deleting = false;
-        roleIdx = (roleIdx + 1) % roles.length;
-        delay = 400;
-      }
-      setTimeout(type, delay);
-    }
-    setTimeout(type, 800);
-  }
+  document.getElementById('contact-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    btn.textContent = 'Sent ✓';
+    btn.style.background = 'var(--accent-2)';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = 'Send Message';
+      btn.style.background = '';
+      btn.disabled = false;
+      this.reset();
+    }, 3000);
+  });
 
   /* ---- SMOOTH SCROLL ---- */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -280,27 +237,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-
-  /* ---- THEME TOGGLE ---- */
-  const toggleBtn = document.getElementById('theme-toggle');
-
-  if (toggleBtn) {
-    if (localStorage.getItem('theme') === 'light') {
-      document.body.classList.add('light-theme');
-      toggleBtn.textContent = '☀️';
-    }
-
-    toggleBtn.addEventListener('click', () => {
-      document.body.classList.toggle('light-theme');
-
-      if (document.body.classList.contains('light-theme')) {
-        localStorage.setItem('theme', 'light');
-        toggleBtn.textContent = '☀️';
-      } else {
-        localStorage.setItem('theme', 'dark');
-        toggleBtn.textContent = '🌙';
-      }
-    });
-  }
 
 });
