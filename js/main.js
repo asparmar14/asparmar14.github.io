@@ -214,22 +214,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---- CONTACT FORM ---- */
-  const contactForm = document.getElementById('contact-form');
-  contactForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btn = contactForm.querySelector('button[type="submit"]');
-    btn.textContent = 'Sent ✓';
-    btn.style.background = 'var(--green-dim)';
-    btn.style.color = 'var(--green)';
-    btn.disabled = true;
-    setTimeout(() => {
-      btn.textContent = 'Send Message';
-      btn.style.background = '';
-      btn.style.color = '';
-      btn.disabled = false;
-      contactForm.reset();
-    }, 3000);
-  });
+  contactForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+  const data = new FormData(form);
+
+  const btn = form.querySelector('button[type="submit"]');
+
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (res.ok) {
+      btn.textContent = 'Sent ✓';
+      form.reset();
+    } else {
+      btn.textContent = 'Error ❌';
+    }
+  } catch (err) {
+    btn.textContent = 'Error ❌';
+  }
+});
 
   /* ---- TYPING EFFECT (hero) ---- */
   const typingEl = document.getElementById('typing-text');
